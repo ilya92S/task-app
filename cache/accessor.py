@@ -1,10 +1,13 @@
 import redis
+from sqlalchemy import select
+
+from settings import settings
 
 def get_redis_connection() -> redis.Redis:
     return redis.Redis(
-        host="localhost",
-        port=6378,
-        db=0
+        host=settings.CACHE_HOST,
+        port=settings.CACHE_PORT,
+        db=settings.CACHE_DB
     )
 
 

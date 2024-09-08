@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 
 run: ## запускаем наш сервер командой make run
-	poetry run uvicorn main:app --reload --env-file .dev.env
+	poetry run uvicorn main:app --reload --env-file .local.env
 	## poetry run fastapi dev main.py --reload тут --env-file не работает
 
 install: ## устанавливаем зависимости используя poetry
