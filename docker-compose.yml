@@ -1,0 +1,48 @@
+
+version: '3.9'
+
+services:
+
+  db:
+    container_name: my_test_app
+    image: postgres:16
+    restart: always
+
+    shm_size: 128mb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5430:5432"
+    environment:
+      POSTGRES_PASSWORD: my_password
+      POSTGRES_USER: my_admin
+      POSTGRES_DB: my_db
+    networks:
+      - my_network
+
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    networks:
+      - my_network
+
+  cache:
+    image: redis:7.2.4-alpine
+    restart: always
+    ports:
+      - '6378:6379'
+    networks:
+      - my_network
+
+volumes:
+  postgres_data:
+
+networks:
+  my_network:
+    driver: bridge
