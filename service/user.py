@@ -8,10 +8,15 @@ from schema import UserLoginScheme
 
 @dataclass
 class UserService:
-    user_repository = UserRepository
+    user_repository: UserRepository
 
     def create_user(self, username: str, password: str) -> UserLoginScheme:
-        user = self.user_repository.create_uer(username, password)
+        access_token: str = self._generate_access_token()
+        user = self.user_repository.create_user(
+            username=username,
+            password=password,
+            access_token=access_token
+            )
         return UserLoginScheme(user_id=user.id, access_token=user.access_token)
 
     @staticmethod
