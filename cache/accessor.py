@@ -1,7 +1,9 @@
 import redis
 from sqlalchemy import select
 
-from settings import settings
+from settings import Settings
+
+settings = Settings()
 
 def get_redis_connection() -> redis.Redis:
     return redis.Redis(

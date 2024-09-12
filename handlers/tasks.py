@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from typing import Annotated
 
-from dependency import get_task_service, get_tasks_repository, get_tasks_cache_repository
+from dependency import get_task_service, get_tasks_repository
 from repository import TaskRepository, TaskCache
 
 from schema.task import TaskSchema
@@ -17,11 +17,7 @@ async def drop_all_table(
 
     task_repository.create_tasks_and_category()
 
-# @router.get("/all", response_model=list[TaskSchema])
-# async def get_task(
-#         task_repository: Annotated[TaskRepository, Depends(get_tasks_repository)],
-#         task_cache: Annotated[TaskCache, Depends(get_tasks_cache_repository)]
-# ):
+
 @router.get("/all", response_model=list[TaskSchema])
 async def get_task(
         task_service: Annotated[TaskService, Depends(get_task_service)]
