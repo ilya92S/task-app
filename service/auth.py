@@ -2,8 +2,14 @@ from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
 
 import jwt
+from jwt import PyJWTError
 
-from exception import UserNotCorrectPasswordException, UserNotFoundException
+from exception import (
+    UserNotCorrectPasswordException,
+    UserNotFoundException,
+    TokenExpired,
+    TokenNotCorrect
+)
 from models import UserProfile
 from repository import UserRepository
 from schema import UserLoginScheme
@@ -14,7 +20,6 @@ from settings import Settings
 class AuthService:
     user_repository: UserRepository
     settings: Settings()
-
 
     def login(self, username: str, password: str) -> UserLoginScheme:
         user = self.user_repository.get_user_by_username(username=username)
@@ -37,3 +42,16 @@ class AuthService:
             algorithm=self.settings.ALGORITHM
         )
         return token
+
+    def get_user_id_from_access_token(self, access_token: str) -> int:
+        try:
+            payload = jwt.decode(
+                access_token,
+                key=self.settings.SECRET_KEY,
+                algorithms=[self.settings.ALGORITHM]
+            )
+        except PyJWTError:
+            raise TokenNotCorrect
+        if payload["expire"] < datetime.now(timezone.utc).timestamp():
+            raise TokenExpired
+        return payload["user_id"]
