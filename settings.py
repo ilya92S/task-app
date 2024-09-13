@@ -10,12 +10,14 @@ class Settings(BaseSettings):
     DB_USER: str = "admin"
     DB_DRIVER: str = "postgresql+psycopg2"
 
-    CACHE_HOST: str = "localhost"
-    CACHE_PORT: int = 6378
+    CACHE_HOST: str = "host"
+    CACHE_PORT: int = 000
     CACHE_DB: int = 0
+
+    SECRET_KEY: str = "key"
+    ALGORITHM: str = "algo"
 
     @property
     def db_url(self):
         return f"{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
-settings = Settings()

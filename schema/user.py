@@ -6,6 +6,6 @@ class UserLoginScheme(BaseModel):
 
 
 
-class UserCreateSchema(BaseModel):
+class UserCreateScheme(BaseModel):
     username: str
     password: str
