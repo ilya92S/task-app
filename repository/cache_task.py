@@ -1,13 +1,13 @@
 import json
+from dataclasses import dataclass
 
 from redis import Redis
 
 from schema.task import TaskSchema
 
-
+@dataclass
 class TaskCache:
-    def __init__(self, redis: Redis):
-        self.redis = redis
+    redis: Redis
 
     def get_tasks(self) -> list[TaskSchema] | TaskSchema:
         with self.redis as redis:

@@ -30,5 +30,5 @@ class UserRepository:
         query = select(UserProfile).where(UserProfile.username == username)
         with (self.db_session() as session):
             result = session.execute(query)
-            username = result.scalar_one_or_none()
-            return username
+            user = result.scalar_one_or_none()
+            return user

@@ -28,7 +28,7 @@ class AuthService:
         return UserLoginScheme(user_id=user.id, access_token=access_token)
 
     @staticmethod
-    def _validate_auth_user(user: UserProfile, password: str):
+    def _validate_auth_user(user: UserProfile, password: str) -> None:
         if not user:
             raise UserNotFoundException
         if user.password != password:
@@ -55,3 +55,19 @@ class AuthService:
         if payload["expire"] < datetime.now(timezone.utc).timestamp():
             raise TokenExpired
         return payload["user_id"]
+
+    def get_google_redirect_url(self) -> str:
+        return self.settings.google_redirect_url
+
+    def google_auth(self, code: str):
+        """
+        Мы должны сходить в гугл по этому коду в гугл
+        и получить поределенные данные.
+        Здесь мы обращаемся к внешнему сервису, здесь мы
+        должны написать клиента, это еще одна дополнительная сущность,
+        которая инкапсулирует в себе запросы в другие сервисы, например
+        OAuth_client. Клиент будет иметь в себе все методы, которые
+        будут иметь авторизацию через другие сервисы. В моем случае
+        в папке /client/google_client.py
+        """
+        pass

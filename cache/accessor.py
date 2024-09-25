@@ -1,5 +1,4 @@
 import redis
-from sqlalchemy import select
 
 from settings import Settings
 
