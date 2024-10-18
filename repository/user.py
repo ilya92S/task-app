@@ -4,16 +4,16 @@ from sqlalchemy import insert, select
 from sqlalchemy.orm import Session
 
 from models import UserProfile
+from schema import UserCreateScheme
 
 
 @dataclass
 class UserRepository:
     db_session: Session
 
-    def create_user(self, username: str, password: str) -> UserProfile:
+    def create_user(self, user: UserCreateScheme) -> UserProfile:
         query = insert(UserProfile).values(
-            username=username,
-            password=password
+            **user.model_dump()
         ).returning(UserProfile.id)
         with self.db_session() as session:
             user_id: int = session.execute(query).scalar()
@@ -28,6 +28,13 @@ class UserRepository:
 
     def get_user_by_username(self, username: str) -> UserProfile | None:
         query = select(UserProfile).where(UserProfile.username == username)
+        with (self.db_session() as session):
+            result = session.execute(query)
+            user = result.scalar_one_or_none()
+            return user
+
+    def get_user_by_email(self, email: str) -> UserProfile | None:
+        query = select(UserProfile).where(UserProfile.email == email)
         with (self.db_session() as session):
             result = session.execute(query)
             user = result.scalar_one_or_none()
