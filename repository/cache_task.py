@@ -1,7 +1,7 @@
 import json
 from dataclasses import dataclass
 
-from redis import Redis
+from redis import asyncio as Redis
 
 from schema.task import TaskSchema
 
@@ -9,13 +9,13 @@ from schema.task import TaskSchema
 class TaskCache:
     redis: Redis
 
-    def get_tasks(self) -> list[TaskSchema] | TaskSchema:
-        with self.redis as redis:
-            task_json = redis.lrange("tasks", 0, -1)
+    async def get_tasks(self) -> list[TaskSchema] | TaskSchema:
+        async with self.redis as redis:
+            task_json = await redis.lrange("tasks", 0, -1)
 
             return [TaskSchema.model_validate(json.loads(task.decode('utf-8'))) for task in task_json]
 
-    def set_tasks(self, tasks: list[TaskSchema]):
-        tasks_json = [task.json() for task in tasks]
-        with self.redis as redis:
-            redis.lpush("tasks", *tasks_json)
+    async def set_tasks(self, tasks: list[TaskSchema]):
+        tasks_json = [task.model_dump_json() for task in tasks]
+        async with self.redis as redis:
+            await redis.lpush("tasks", *tasks_json)

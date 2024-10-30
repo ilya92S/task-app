@@ -27,7 +27,8 @@ async def drop_all_table(
 async def get_task(
         task_service: Annotated[TaskService, Depends(get_task_service)]
 ):
-    return task_service.get_task()
+    tasks = await task_service.get_task()
+    return tasks
 
 @router.post(
     "/create-task",
@@ -38,7 +39,7 @@ async def create_task(
         task_service: Annotated[TaskService, Depends(get_task_service)],
         user_id: int = Depends(get_request_user_id)
 ):
-    task = task_service.create_task(body, user_id)
+    task = await task_service.create_task(body, user_id)
     return task
 
 @router.patch("/patch-task", response_model=TaskSchema)

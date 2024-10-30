@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DB_NAME: str = "name"
     DB_PASS: str = "password"
     DB_USER: str = "admin"
-    DB_DRIVER: str = "postgresql+psycopg2"
+    DB_DRIVER: str = "postgresql+asynсpg"
 
     CACHE_HOST: str = "host"
     CACHE_PORT: int = 000
