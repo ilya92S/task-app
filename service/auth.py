@@ -4,6 +4,7 @@ from os import access
 
 import jwt
 from jwt import PyJWTError
+from sqlalchemy.util import await_only
 
 from client import GoogleClient, YandexClient
 from exception import (
@@ -25,9 +26,10 @@ class AuthService:
     google_client: GoogleClient
     yandex_client: YandexClient
 
-    def login(self, username: str, password: str) -> UserLoginScheme:
-        user = self.user_repository.get_user_by_username(username=username)
+    async def login(self, username: str, password: str) -> UserLoginScheme:
+        user = await self.user_repository.get_user_by_username(username=username)
         self._validate_auth_user(user, password)
+        print(f"наш id {user.id} от пользователя {userт}")
         access_token = self.generate_access_token(user_id=user.id)
         return UserLoginScheme(user_id=user.id, access_token=access_token)
 
@@ -66,10 +68,10 @@ class AuthService:
     def get_yandex_redirect_url(self) -> str:
         return self.settings.yandex_redirect_url
 
-    def yandex_auth(self, code: str):
-        user_data = self.yandex_client.get_user_info(code=code)
+    async def yandex_auth(self, code: str):
+        user_data = await self.yandex_client.get_user_info(code=code)
 
-        if user := self.user_repository.get_user_by_email(email=user_data.default_email):
+        if user := await self.user_repository.get_user_by_email(email=user_data.default_email):
             access_token = self.generate_access_token(user_id=user.id)
 
             return UserLoginScheme(user_id=user.id, access_token=access_token)
@@ -79,7 +81,7 @@ class AuthService:
             email=user_data.default_email,
             name=user_data.name
         )
-        created_user = self.user_repository.create_user(create_user_data)
+        created_user = await self.user_repository.create_user(create_user_data)
         access_token = self.generate_access_token(user_id=created_user.id)
 
         return UserLoginScheme(user_id=created_user.id, access_token=access_token)
@@ -87,7 +89,7 @@ class AuthService:
     def get_yandex_auth(self, code: str):
         print(code)
 
-    def google_auth(self, code: str):
+    async def google_auth(self, code: str):
         """
         Мы должны сходить в гугл по этому коду в гугл
         и получить поределенные данные.
@@ -98,11 +100,11 @@ class AuthService:
         будут иметь авторизацию через другие сервисы. В моем случае
         в папке /client/google.py
         """
-        user_data = self.google_client.get_user_info(code=code)
+        user_data = await self.google_client.get_user_info(code=code)
         # мы получили данные пользователя из аккаунта гугл
         # если в БД есть пользователь с google_token, то не создаем его,
         # иначе создаем.
-        if user := self.user_repository.get_user_by_email(email=user_data.email):
+        if user := await self.user_repository.get_user_by_email(email=user_data.email):
             access_token = self.generate_access_token(user_id=user.id)
             print("user login")
             return UserLoginScheme(user_id=user.id, access_token=access_token)
@@ -114,7 +116,7 @@ class AuthService:
             email=user_data.email,
             name=user_data.name
         )
-        created_user = self.user_repository.create_user(create_user_data)
+        created_user = await self.user_repository.create_user(create_user_data)
         access_token = self.generate_access_token(user_id=created_user.id)
         # именно сгенерированный токен отправляем на фронт
         print("user_create")

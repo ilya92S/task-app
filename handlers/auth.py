@@ -3,6 +3,7 @@ from typing import Annotated
 
 from fastapi import Depends, APIRouter, HTTPException
 from fastapi.responses import RedirectResponse
+from fontTools.misc.cython import returns
 
 from dependency import get_auth_service
 from exception import UserNotFoundException, UserNotCorrectPasswordException
@@ -21,7 +22,7 @@ async def login(
     auth_service: Annotated[AuthService, Depends(get_auth_service)]
 ):
     try:
-        return auth_service.login(body.username, body.password)
+        return await auth_service.login(body.username, body.password)
     except UserNotFoundException as e:
         raise HTTPException(
             status_code=e.status_code,
@@ -63,7 +64,7 @@ async def google_auth(
     на уже есть такой пользователь, если нет регистрируем записал google_access_token
     """
     print(f"google {code=}")
-    return auth_service.google_auth(code=code)
+    return await auth_service.google_auth(code=code)
 
 
 @router.get(
@@ -84,4 +85,4 @@ async def yandex_auth(
         auth_service: Annotated[AuthService, Depends(get_auth_service)],
         code: str
 ):
-    return auth_service.yandex_auth(code=code)
+    return await auth_service.yandex_auth(code=code)
